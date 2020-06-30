@@ -18,6 +18,14 @@
 //!     a.as_c() + A::complex(1.0, 1.0)  // upcast to complex if real
 //! }
 //! ```
+#![cfg_attr(all(feature = "mesalock_sgx", not(target_env = "sgx")), no_std)]
+#![cfg_attr(
+    all(target_env = "sgx", target_vendor = "mesalock"),
+    feature(rustc_private)
+)]
+
+#[cfg(all(feature = "mesalock_sgx", not(target_env = "sgx")))]
+extern crate sgx_tstd as std;
 
 use num_complex::Complex;
 use num_traits::{Float, FromPrimitive, NumAssign, NumCast, NumOps, ToPrimitive, Zero};
@@ -115,7 +123,7 @@ macro_rules! impl_float {
         fn $name(&self) -> Self {
             Float::$name(*self)
         }
-    }
+    };
 }
 
 macro_rules! impl_complex {
@@ -124,7 +132,7 @@ macro_rules! impl_complex {
         fn $name(&self) -> Self {
             Complex::$name(self)
         }
-    }
+    };
 }
 
 macro_rules! impl_with_real {
